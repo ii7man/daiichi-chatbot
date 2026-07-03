@@ -149,32 +149,59 @@ export default async function handler(req, res) {
     parts: [{ text: m.content }],
   }));
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: geminiMessages,
-        }),
+  const maxRetries = 3;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: geminiMessages,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        // Check if it's a rate limit error
+        const msg = data.error.message || "";
+        if (response.status === 429 || msg.includes("quota") || msg.includes("rate")) {
+          // Extract wait time from error message (e.g., "Please retry in 1.799532782s")
+          const match = msg.match(/retry in ([\d.]+)s/i);
+          const waitSec = match ? Math.ceil(parseFloat(match[1])) + 1 : 5;
+
+          if (attempt < maxRetries - 1) {
+            // Wait and retry silently
+            await new Promise((r) => setTimeout(r, waitSec * 1000));
+            continue;
+          } else {
+            // All retries exhausted — tell frontend the wait time
+            return res.status(429).json({
+              error: "Rate limited",
+              retryAfter: waitSec,
+            });
+          }
+        }
+        return res.status(500).json({ error: data.error.message });
       }
-    );
 
-    const data = await response.json();
+      const text =
+        data.candidates?.[0]?.content?.parts
+          ?.map((p) => p.text)
+          .join("") || "Sorry, I could not generate a response.";
 
-    if (data.error) {
-      return res.status(500).json({ error: data.error.message });
+      return res.status(200).json({ response: text });
+    } catch (err) {
+      if (attempt < maxRetries - 1) {
+        await new Promise((r) => setTimeout(r, 3000));
+        continue;
+      }
+      return res.status(500).json({ error: err.message });
     }
-
-    const text =
-      data.candidates?.[0]?.content?.parts
-        ?.map((p) => p.text)
-        .join("") || "Sorry, I could not generate a response.";
-
-    return res.status(200).json({ response: text });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
   }
 }

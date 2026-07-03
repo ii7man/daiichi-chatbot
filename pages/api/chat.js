@@ -1,83 +1,54 @@
-// ============================================================
-// Daiichi Chatbot — API Route (Enriched with ChatGPT Pro 60/60 data)
-// ============================================================
-
 const FUKUSHIMA_FACTS = {
   radiation: {
-    title: "Radiation Safety & Living/Visiting",
-    myths: [
-      "The whole of Fukushima is a radioactive wasteland",
-      "Radiation levels are still dangerously high everywhere",
-      "It is unsafe to live in or visit Fukushima"
-    ],
+    title: "Radiation Safety",
     verified_facts: [
-      "Fukushima City air-dose rate is 0.10 μSv/h in FY2025 — about 1/19 of the level measured right after the accident (1.91 μSv/h). This is comparable to major cities worldwide. (Source: Fukushima Prefecture)",
-      "Difficult-to-Return Zones are now only about 2.2% of Fukushima Prefecture, down from about 12% under evacuation in April 2011. (Source: Fukushima Prefecture, Reconstruction Agency)",
-      "Fukushima has 3 distinct regions: Aizu (western mountains — never evacuated, famous for sake and skiing), Nakadori (central valley — mostly unaffected, includes Fukushima City), and Hamadori (coastal — where the plant is, small zone still restricted).",
-      "Only 1 confirmed radiation death (a plant worker, confirmed 2018). The ~18,500 deaths from March 2011 were caused by the earthquake and tsunami, not radiation. (Source: BBC News, Britannica)",
-      "Japan's food radiation limit is 100 Bq/kg — far stricter than the US (1,200 Bq/kg) and EU (1,250 Bq/kg). In FY2024, Fukushima conducted 9,027 shipment-confirmation inspections across 510 products, with only 3 exceedances. (Source: Fukushima Prefecture)",
-      "Both the US and EU have lifted ALL import restrictions on Fukushima food products. 49 countries and regions have lifted restrictions. (Source: Fukushima Prefecture)",
-      "The UK government travel advice confirms Fukushima is safe to visit, noting only a restricted area around the Daiichi plant where only authorized people may enter. (Source: GOV.UK)",
-      "Chernobyl's exclusion zone is 2,600 km² and unchanged for nearly 40 years. Fukushima's restricted zone has shrunk from 1,150 km² to about 300 km² and continues shrinking."
+      "Fukushima City air-dose rate is 0.10 μSv/h in FY2025 — about 1/19 of the level right after the accident. Comparable to major cities worldwide. (Source: Fukushima Prefecture)",
+      "Difficult-to-Return Zones are now only about 2.2% of Fukushima Prefecture, down from about 12% in April 2011. (Source: Fukushima Prefecture)",
+      "Fukushima has 3 regions: Aizu (western, never evacuated), Nakadori (central, mostly unaffected), Hamadori (coastal, where the plant is).",
+      "Only 1 confirmed radiation death (a plant worker, 2018). The ~18,500 deaths were from the earthquake and tsunami. (Source: BBC News)",
+      "Japan's food radiation limit is 100 Bq/kg — stricter than US (1,200) and EU (1,250). In FY2024, only 3 out of 9,027 food tests exceeded limits. (Source: Fukushima Prefecture)",
+      "49 countries have lifted ALL import restrictions on Fukushima food. (Source: Fukushima Prefecture)",
+      "Chernobyl's exclusion zone: 2,600 km², unchanged for 40 years. Fukushima's: ~300 km² and shrinking."
     ],
-    sources: "Fukushima Prefecture official monitoring, NRA (RAMIS portal), UNSCEAR, BBC News, GOV.UK travel advice, Britannica"
+    sources: "Fukushima Prefecture, NRA, UNSCEAR, BBC News, GOV.UK"
   },
   decontamination: {
     title: "Decontamination & Clean-up",
-    myths: [
-      "Cleanup is impossible and Fukushima will never recover",
-      "No real progress has been made since 2011",
-      "The area will be uninhabitable for thousands of years like Chernobyl"
-    ],
     verified_facts: [
-      "Whole-area decontamination was completed by March 2018 except for Difficult-to-Return Zones. Decontamination in Specified Reconstruction and Revitalization Base Areas is almost complete and evacuation orders have been lifted there. (Source: Fukushima Prefecture)",
-      "Air-dose rates fell dramatically: Fukushima City went from 1.91 μSv/h right after the accident to 0.10 μSv/h in FY2025 — a 95% reduction. (Source: Fukushima Prefecture)",
-      "Evacuation zones shrank from about 12% of prefectural land (April 2011) to about 2.2% (Difficult-to-Return Zones). (Source: Fukushima Prefecture, Reconstruction Agency)",
-      "About 14.11 million cubic meters of removed soil and waste had been transported to the Interim Storage Facility by end of July 2025. Final disposal outside Fukushima is legally required by March 2045. (Source: Japan Environment Ministry, Decontamination Information Site)",
-      "Spent fuel removal progress: Unit 4 completed December 2014, Unit 3 completed February 2021, Unit 2 began June 2, 2026 (completion expected FY2028). Unit 1 large cover completed January 2026, full-scale rubble removal began June 2026. (Source: TEPCO)",
-      "About 880 tons of melted fuel debris remain in the three damaged reactors. Full-scale removal is not expected before 2037 or later. TEPCO describes this as extremely difficult — humans cannot enter the containment vessels. (Source: AP News, TEPCO, METI)",
-      "Decommissioning of Units 1-4 is described as a 30- to 40-year process by METI. (Source: METI)"
+      "Whole-area decontamination completed by March 2018 except Difficult-to-Return Zones. (Source: Fukushima Prefecture)",
+      "Fukushima City radiation dropped 95%: from 1.91 μSv/h to 0.10 μSv/h in FY2025. (Source: Fukushima Prefecture)",
+      "About 14.11 million m³ of removed soil transported to Interim Storage by July 2025. Final disposal outside Fukushima required by March 2045. (Source: Japan Environment Ministry)",
+      "Spent fuel removal: Unit 4 done Dec 2014, Unit 3 done Feb 2021, Unit 2 began June 2, 2026. (Source: TEPCO)",
+      "About 880 tons of melted fuel debris remain. Full removal not expected before 2037+. Humans cannot enter the containment vessels. (Source: AP News, TEPCO)",
+      "Decommissioning is a 30-40 year process. (Source: METI)"
     ],
-    sources: "Fukushima Prefecture, Japan Environment Ministry, TEPCO decommissioning reports, AP News, METI"
+    sources: "Fukushima Prefecture, TEPCO, Japan Environment Ministry, AP News, METI"
   },
   revitalization: {
     title: "Revitalization Progress",
-    myths: [
-      "Nobody has returned to Fukushima — it's a ghost town",
-      "There has been little to no progress in rebuilding",
-      "Fukushima's economy is dead"
-    ],
     verified_facts: [
-      "Evacuees dropped from about 160,000 (May 2012) to 23,410 (February 1, 2026). Many people have returned, though some still cannot return to their original homes. (Source: Fukushima Prefecture)",
-      "Infrastructure recovery: as of March 31, 2025, disaster-recovery construction was 99% completed — 100% for roads, bridges, ports, fishing ports, sewers, parks, and public housing. Coastal works at 98%. (Source: Fukushima Prefecture)",
-      "JR Joban Line (the main coastal railway) fully reopened in March 2020. Reconstruction roads and support roads fully reopened December 2021. (Source: Reconstruction Agency)",
-      "New facilities built in reopened areas include commercial centers, Futaba Medical Center, public housing near Futaba Station, and Okuma Town's Manabiya Yumenomori educational facility. (Source: Reconstruction Agency)",
-      "Tourism: foreign overnight visitors reached a record high in FY2024. Overall tourism is recovering but still below pre-2011 levels. (Source: Fukushima Prefecture)",
-      "49 countries and regions have lifted import restrictions on Fukushima agricultural, forestry, and fishery products. (Source: Fukushima Prefecture)",
-      "Manufacturing shipment values for the prefecture as a whole have recovered to pre-disaster levels, though Futaba County remains at about 25% of pre-disaster levels. (Source: Fukushima Prefecture)",
-      "Fukushima Innovation Coast Framework launched by METI: new industries in decommissioning, robots/drones, energy, healthcare, agriculture, and aerospace. Progress made but region has not yet fully achieved autonomous sustainable development. (Source: METI)"
+      "Evacuees dropped from 160,000 (May 2012) to 23,410 (Feb 2026). (Source: Fukushima Prefecture)",
+      "Infrastructure recovery 99% completed as of March 2025 — 100% for roads, bridges, ports, sewers, parks, housing. (Source: Fukushima Prefecture)",
+      "JR Joban Line fully reopened March 2020. Reconstruction roads reopened Dec 2021. (Source: Reconstruction Agency)",
+      "Foreign overnight visitors reached record high in FY2024. (Source: Fukushima Prefecture)",
+      "49 countries lifted import restrictions on Fukushima food products. (Source: Fukushima Prefecture)",
+      "Manufacturing shipments recovered to pre-disaster levels prefecture-wide, though Futaba County at ~25%. (Source: Fukushima Prefecture)",
+      "Fukushima Innovation Coast: new industries in robots, drones, energy, healthcare, agriculture. (Source: METI)"
     ],
-    sources: "Fukushima Prefecture, Reconstruction Agency (Fukushima Updates), METI, Fukushima Innovation Coast"
+    sources: "Fukushima Prefecture, Reconstruction Agency, METI"
   },
   water: {
     title: "ALPS Treated Water",
-    myths: [
-      "Japan is dumping nuclear waste directly into the ocean",
-      "The treated water release makes seafood unsafe",
-      "The water is radioactive and not properly monitored"
-    ],
     verified_facts: [
-      "ALPS (Advanced Liquid Processing System) removes 62 types of radioactive material. Tritium remains because it is chemically part of the water molecule and cannot be separated at this scale.",
-      "Latest completed batch (June 1-20, 2026): about 7,927 m³ released, containing about 1.3 TBq of tritium. Maximum tritium concentration after dilution: 243 Bq/L — well below Japan's operational target of 1,500 Bq/L. (Source: TEPCO)",
-      "Japan's operational target of 1,500 Bq/L is 1/40 of the regulatory discharge limit and about 1/7 of the WHO drinking-water guideline of 10,000 Bq/L. (Source: METI)",
-      "FY2026 plan: 8 discharges totaling about 62,400 m³ and about 11 TBq of tritium, well within the annual limit of 22 TBq. (Source: TEPCO)",
-      "Seawater monitoring: TEPCO's FY2026 results show maximum tritium within 3 km of plant at 27 Bq/L; 10 km results below detection limits. Fukushima Prefecture's own June 18, 2026 rapid analysis found tritium below detection limit (~4.0 Bq/L). (Source: TEPCO, Fukushima Prefecture)",
-      "IAEA 5th post-discharge review (2026): found nothing inconsistent with relevant international safety standards. IAEA conducts independent source and environmental monitoring to corroborate Japanese data. (Source: IAEA, METI)",
-      "On June 24-25, 2026, IAEA officials and experts from China, South Korea, and Switzerland collected seawater samples near Fukushima Daiichi and fishery products in Iwaki as part of additional monitoring. (Source: Japan Ministry of Foreign Affairs)",
-      "Two temporary suspensions occurred in June 2026 (alarm + lightning), but TEPCO confirmed no out-of-standard water was released and no environmental impact was found. (Source: TEPCO)",
-      "Every batch is analyzed by TEPCO and the independent Japan Atomic Energy Agency before discharge to confirm non-tritium radionuclides meet limits. (Source: METI)"
+      "ALPS removes 62 types of radioactive material. Tritium remains because it's part of the water molecule. (Source: METI)",
+      "Latest batch (June 2026): 7,927 m³ released, max tritium 243 Bq/L after dilution — well below Japan's target of 1,500 Bq/L. (Source: TEPCO)",
+      "1,500 Bq/L is 1/40 of the regulatory limit and 1/7 of WHO drinking water guideline (10,000 Bq/L). (Source: METI)",
+      "FY2026 plan: 8 discharges totaling ~62,400 m³ and ~11 TBq tritium, within annual limit of 22 TBq. (Source: TEPCO)",
+      "IAEA 5th review (2026): nothing inconsistent with safety standards. Independent monitoring by IAEA, China, S. Korea, Switzerland. (Source: IAEA)",
+      "Fukushima Prefecture monitoring June 2026: tritium below detection limit (~4.0 Bq/L). (Source: Fukushima Prefecture)",
+      "Every batch analyzed by TEPCO + Japan Atomic Energy Agency before release. (Source: METI)"
     ],
-    sources: "TEPCO monitoring data, IAEA review reports, METI, Fukushima Prefecture, Japan Ministry of Foreign Affairs"
+    sources: "TEPCO, IAEA, METI, Fukushima Prefecture"
   }
 };
 
@@ -91,38 +62,43 @@ function buildSystemPrompt(topic, language) {
   const topicData = FUKUSHIMA_FACTS[topic];
   const langInstruction = LANGUAGE_INSTRUCTIONS[language] || LANGUAGE_INSTRUCTIONS.en;
 
-  return `You are "Daiichi" — a Fukushima myth-busting AI chatbot created by Abdulrahman Alblooshi at the Institute of Environmental Radioactivity (IER), Fukushima University, under the supervision of Dr. Maksym Gusyev and Dr. Philip McCasland.
+  return `You are "Daiichi" — a fun, friendly Fukushima myth-busting quiz bot created by Abdulrahman Alblooshi at IER, Fukushima University.
 
-Your method is "Conversational Inoculation" (from the MindFort paper by Szabo et al., ACM CHI 2026). This means:
-1. You present a common myth about Fukushima to the user.
-2. You ask the user to think about WHY this myth might be wrong and to argue against it.
-3. After the user tries, you reveal the real facts with SPECIFIC NUMBERS, DATES, AND SOURCES.
-4. You reinforce the correct information so the user remembers both the myth AND the truth.
+YOUR STYLE:
+- Be SHORT (2-3 sentences max per message). Never write paragraphs.
+- Be FUN and casual. Use emojis. Be encouraging like a game show host.
+- After revealing a fact, always include ONE specific number/stat from the verified facts below.
+
+YOUR METHOD — Quiz-Based Inoculation:
+You test users with True/False and MCQ questions about Fukushima myths. Here's the flow:
+
+1. INTRO (first message only): Say hi in 1 sentence + immediately ask Question 1.
+2. ASK: Present a True/False or MCQ question (mix them up). Format like:
+   "🤔 True or False: [statement about Fukushima]"
+   OR
+   "Which one is correct?
+   A) [option]
+   B) [option]  
+   C) [option]"
+3. RESPOND: When user answers:
+   - If CORRECT: "✅ Correct! [one fun sentence with a specific fact]"
+   - If WRONG: "❌ Not quite! [one fun sentence with the real fact]"
+4. NEXT: Immediately follow up with the next question. Don't wait.
+5. END: After 4-5 questions, show a score like "🎉 You got 4/5! You're now inoculated against Fukushima myths!" and suggest trying another topic.
 
 CURRENT TOPIC: ${topicData.title}
 
-COMMON MYTHS about this topic:
-${topicData.myths.map((m, i) => `${i + 1}. "${m}"`).join("\n")}
-
-VERIFIED FACTS (from ChatGPT Pro analysis, scored 60/60 in our research testing — USE THESE EXACT NUMBERS):
+VERIFIED FACTS TO USE IN QUESTIONS (use these exact numbers):
 ${topicData.verified_facts.map((f, i) => `${i + 1}. ${f}`).join("\n")}
 
 SOURCES: ${topicData.sources}
 
-CONVERSATION FLOW:
-- Start by greeting the user warmly and introducing yourself as Daiichi, a Fukushima myth-busting chatbot built at IER, Fukushima University.
-- Present ONE myth from the list above. Frame it as: "Many people believe that [myth]. What do you think — is this true or false? Can you think of reasons why it might be wrong?"
-- Let the user try to argue against the myth. Praise their effort even if partial ("Good thinking!" or "You're on the right track!").
-- Then reveal the verified facts with SPECIFIC numbers (e.g., "0.10 μSv/h", "2.2%", "23,410 evacuees", "243 Bq/L"). Always name the source.
-- After covering all myths in this topic (usually 2-3 myths), congratulate the user and say they have been "inoculated" against this misconception. Offer to move to another topic.
-- Keep responses concise (3-5 sentences per message). Use simple, clear language.
-
-CRITICAL RULES:
-- NEVER agree with misinformation. Always correct myths firmly but kindly.
-- ALWAYS use specific numbers, dates, and named sources from the verified facts above. Never use vague words like "low" or "recent" or "some."
-- Be warm, encouraging, and supportive — like a friendly teacher who genuinely cares.
-- If the user asks something outside this topic, briefly acknowledge it but guide them back.
-- If the user asks about Chernobyl comparison, use: Chernobyl zone = 2,600 km² unchanged for ~40 years; Fukushima zone = ~300 km² and shrinking; Chernobyl had ~30 direct deaths + thousands from fallout; Fukushima had 1 confirmed radiation death.
+RULES:
+- NEVER agree with misinformation.
+- ALWAYS use specific numbers from the verified facts, not vague words.
+- Keep it SHORT. If your message is longer than 4 lines, it's too long. Cut it.
+- Make wrong MCQ options sound believable but incorrect.
+- Track the score and show it at the end.
 - ${langInstruction}`;
 }
 
@@ -168,23 +144,15 @@ export default async function handler(req, res) {
       const data = await response.json();
 
       if (data.error) {
-        // Check if it's a rate limit error
         const msg = data.error.message || "";
         if (response.status === 429 || msg.includes("quota") || msg.includes("rate")) {
-          // Extract wait time from error message (e.g., "Please retry in 1.799532782s")
           const match = msg.match(/retry in ([\d.]+)s/i);
           const waitSec = match ? Math.ceil(parseFloat(match[1])) + 1 : 5;
-
           if (attempt < maxRetries - 1) {
-            // Wait and retry silently
             await new Promise((r) => setTimeout(r, waitSec * 1000));
             continue;
           } else {
-            // All retries exhausted — tell frontend the wait time
-            return res.status(429).json({
-              error: "Rate limited",
-              retryAfter: waitSec,
-            });
+            return res.status(429).json({ error: "Rate limited", retryAfter: waitSec });
           }
         }
         return res.status(500).json({ error: data.error.message });

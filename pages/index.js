@@ -3,7 +3,7 @@ import Head from "next/head";
 
 const TOPICS = {
   radiation: { emoji: "☢️", en: "Radiation Safety", ar: "السلامة الإشعاعية", ja: "放射線の安全性" },
-  food: { emoji: "🍚", en: "Food & Contamination", ar: "الغذاء والتلوث", ja: "食品と汚染" },
+  revitalization: { emoji: "🏘️", en: "Revitalization", ar: "إعادة الإعمار", ja: "復興の進展" },
   decontamination: { emoji: "🏗️", en: "Decontamination", ar: "إزالة التلوث", ja: "除染と復旧" },
   water: { emoji: "🌊", en: "ALPS Treated Water", ar: "مياه ALPS المعالجة", ja: "ALPS処理水" },
 };

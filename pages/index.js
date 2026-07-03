@@ -3,7 +3,7 @@ import Head from "next/head";
 
 const TOPICS = {
   radiation: { emoji: "☢️", en: "Radiation Safety", ar: "السلامة الإشعاعية", ja: "放射線の安全性" },
-  revitalization: { emoji: "🏘️", en: "Revitalization", ar: "إعادة الإعمار", ja: "復興の進展" },
+  food: { emoji: "🍚", en: "Food & Contamination", ar: "الغذاء والتلوث", ja: "食品と汚染" },
   decontamination: { emoji: "🏗️", en: "Decontamination", ar: "إزالة التلوث", ja: "除染と復旧" },
   water: { emoji: "🌊", en: "ALPS Treated Water", ar: "مياه ALPS المعالجة", ja: "ALPS処理水" },
 };
@@ -56,15 +56,51 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const countdownRef = useRef(null);
 
   const t = UI_TEXT[language];
   const dir = LANGUAGES[language].dir;
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages, loading, countdown]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown > 0) {
+      countdownRef.current = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(countdownRef.current);
+    }
+  }, [countdown]);
+
+  async function callAPI(msgs, topicKey, lang) {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: msgs, topic: topicKey, language: lang }),
+    });
+    const data = await res.json();
+
+    // If rate limited and has retryAfter, do countdown and auto-retry
+    if (res.status === 429 && data.retryAfter) {
+      const waitSec = Math.min(data.retryAfter + 2, 30);
+      setCountdown(waitSec);
+      await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+      setCountdown(0);
+      // One final retry
+      const res2 = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: msgs, topic: topicKey, language: lang }),
+      });
+      return await res2.json();
+    }
+
+    return data;
+  }
 
   async function startTopic(topicKey) {
     setTopic(topicKey);
@@ -72,16 +108,11 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: "Start the conversation. Introduce yourself and present the first myth." }],
-          topic: topicKey,
-          language,
-        }),
-      });
-      const data = await res.json();
+      const data = await callAPI(
+        [{ role: "user", content: "Start the conversation. Introduce yourself and present the first myth." }],
+        topicKey,
+        language
+      );
       if (data.error) {
         setMessages([{ role: "assistant", content: `Error: ${data.error}` }]);
       } else {
@@ -91,6 +122,7 @@ export default function Home() {
       setMessages([{ role: "assistant", content: `Connection error: ${err.message}` }]);
     }
     setLoading(false);
+    setCountdown(0);
     setTimeout(() => inputRef.current?.focus(), 100);
   }
 
@@ -105,16 +137,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages,
-          topic,
-          language,
-        }),
-      });
-      const data = await res.json();
+      const data = await callAPI(newMessages, topic, language);
       if (data.error) {
         setMessages([...newMessages, { role: "assistant", content: `Error: ${data.error}` }]);
       } else {
@@ -239,7 +262,15 @@ export default function Home() {
                 <div style={{ ...styles.msgRow, justifyContent: "flex-start" }}>
                   <div style={styles.botAvatar}>🌿</div>
                   <div style={{ ...styles.bubble, ...styles.botBubble, ...styles.loadingBubble }}>
-                    <span style={styles.dot} /><span style={styles.dot} /><span style={styles.dot} />
+                    {countdown > 0 ? (
+                      <span style={styles.countdownText}>
+                        {language === "ar" ? `⏳ ~${countdown}s جاري الانتظار...` :
+                         language === "ja" ? `⏳ ~${countdown}秒 お待ちください...` :
+                         `⏳ ~${countdown}s please wait...`}
+                      </span>
+                    ) : (
+                      <><span style={styles.dot} /><span style={styles.dot} /><span style={styles.dot} /></>
+                    )}
                   </div>
                 </div>
               )}
@@ -471,6 +502,12 @@ const styles = {
     display: "flex",
     gap: 5,
     padding: "14px 20px",
+    alignItems: "center",
+  },
+  countdownText: {
+    fontSize: 13,
+    color: "#2d6a4f",
+    fontWeight: 500,
   },
   dot: {
     width: 8,
